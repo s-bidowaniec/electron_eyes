@@ -1,32 +1,30 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { render } from 'react-dom';
 
 const App = () => {
     const [status, setStatus] = useState('off');
     const [time, setTime] = useState(1200);
     const [timer, setTimer] = useState(null);
+    const bellAudio = new Audio('./sounds/bell.wav');
     const formatTime = (time) => {
         const minutes = String(Math.floor(time/60)).padStart(2,'0')
         const seconds = String(time%60).padStart(2,'0')
         return `${minutes}:${seconds}`
     }
+    useEffect(()=>{
+        if(time===0){
+            bellAudio.play()
+            if(status==='work'){setStatus('rest'); setTime(20)}
+            else if(status==='rest'){setStatus('work'); setTime(1200)}
+        }
+    })
     const startTimer = () => {
-        setTime(5)
+        setTime(1200)
         setStatus('work')
         setTimer(setInterval(() => {
             setTime((prevValue) => {
-                let currentStatus;
                 if (prevValue <= 0){
-                    setStatus((status)=>{
-                        currentStatus = status
-                        if (status==='work'){
-                            return 'rest'
-                        }else if (status==='rest'){
-                            return 'work'
-                        }
-                    })
-                    if (currentStatus==='work'){return 20 }
-                    else {return 1200}
+                    return 0
                 } else {
                     return prevValue - 1
                 }
@@ -38,6 +36,8 @@ const App = () => {
         setTime(1200)
         setStatus('off')
     }
+    const closeApp = () => {window.close()}
+
     return (
       <div>
         <h1>Protect your eyes</h1>
@@ -50,7 +50,7 @@ const App = () => {
         </div>}
           {status === 'off' && <button className="btn" onClick={startTimer}>Start</button>}
           {status !== 'off' && <button className="btn" onClick={stopTimer}>Stop</button>}
-        <button className="btn btn-close">X</button>
+        <button className="btn btn-close" onClick={closeApp}>X</button>
       </div>
 
 )
